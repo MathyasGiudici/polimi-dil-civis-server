@@ -1,0 +1,662 @@
+---
+swagger: "2.0"
+info:
+  description: "RestfulAPI for CIVIS mobile application"
+  version: "1.0.0"
+  title: "CIVIS | RestfulAPI"
+host: "polimi-dil-civis.herokuapp.com"
+basePath: "/api"
+tags:
+- name: "article"
+  description: "all the articles available in CIVIS"
+- name: "comment"
+  description: "comments of the articles"
+- name: "user"
+  description: "all operations available for the users"
+- name: "sms"
+  description: "simulation of the SMS check"
+schemes:
+- "https"
+paths:
+  /article:
+    get:
+      tags:
+      - "article"
+      operationId: "article"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Article"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Article"
+  /article/{id}:
+    get:
+      tags:
+      - "article"
+      operationId: "articleById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "number"
+        format: "integer"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Article"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Article"
+  /article/topic:
+    get:
+      tags:
+      - "article"
+      operationId: "articleByTopic"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "topic"
+        in: "query"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Article"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Article"
+  /article/home:
+    get:
+      tags:
+      - "article"
+      operationId: "articleHome"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Article"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Article"
+  /article/recommended:
+    get:
+      tags:
+      - "article"
+      operationId: "articleRecommended"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Article"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Article"
+  /article/like/{id}:
+    post:
+      tags:
+      - "article"
+      operationId: "articleLikePost"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "number"
+        format: "integer"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Article"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Article"
+    delete:
+      tags:
+      - "article"
+      operationId: "articleLikeRemove"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "number"
+        format: "integer"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Article"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Article"
+  /comment:
+    get:
+      tags:
+      - "comment"
+      operationId: "commentsGet"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "article"
+        in: "query"
+        required: true
+        type: "number"
+        format: "integer"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Comment"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Comment"
+    post:
+      tags:
+      - "comment"
+      operationId: "commentsPost"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "article"
+        in: "query"
+        required: true
+        type: "number"
+        format: "integer"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Comment"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Comment"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Comment"
+  /user/login:
+    post:
+      tags:
+      - "user"
+      operationId: "userLogin"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/AuthReq"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/AuthRes"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "User"
+  /user/logout:
+    post:
+      tags:
+      - "user"
+      operationId: "userLogout"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "OK"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "User"
+  /user/register:
+    post:
+      tags:
+      - "user"
+      operationId: "userRegistration"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: "OK"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "User"
+  /user/register/picture:
+    post:
+      tags:
+      - "user"
+      operationId: "userRegistrationPicture"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "email"
+        in: "formData"
+        required: true
+        type: "string"
+      - name: "image"
+        in: "formData"
+        required: true
+        type: "file"
+      responses:
+        "200":
+          description: "OK"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "User"
+  /user/me:
+    get:
+      tags:
+      - "user"
+      operationId: "userMe"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "User"
+    put:
+      tags:
+      - "user"
+      operationId: "userUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "New user informations. If password is empty the server know\
+          \ that you do not want to change your password"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "User"
+    delete:
+      tags:
+      - "user"
+      operationId: "userDelete"
+      parameters: []
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "string"
+            format: "email"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "User"
+  /sms:
+    get:
+      tags:
+      - "sms"
+      operationId: "getSms"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/SMSCode"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Sms"
+    post:
+      tags:
+      - "sms"
+      operationId: "smsVerification"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/SMSCode"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      x-swagger-router-controller: "Sms"
+definitions:
+  Article:
+    type: "object"
+    properties:
+      id:
+        type: "number"
+        format: "integer"
+        minimum: 0
+      title:
+        type: "string"
+      text:
+        type: "string"
+      topic:
+        type: "string"
+      likesCount:
+        type: "number"
+        format: "integer"
+      commentsCount:
+        type: "number"
+        format: "integer"
+      userLike:
+        type: "boolean"
+      timestamp:
+        type: "string"
+        format: "date-time"
+      statistics:
+        type: "string"
+        format: "url"
+      source:
+        $ref: "#/definitions/Source"
+    example:
+      likesCount: 6.02745618307040320615897144307382404804229736328125
+      commentsCount: 1.46581298050294517310021547018550336360931396484375
+      userLike: true
+      topic: "topic"
+      id: 0.080082819046101150206595775671303272247314453125
+      text: "text"
+      source:
+        name: "name"
+        url: "url"
+      title: "title"
+      timestamp: "2000-01-23T04:56:07.000+00:00"
+      statistics: "http://example.com/aeiou"
+  AuthReq:
+    type: "object"
+    required:
+    - "email"
+    - "password"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      password:
+        type: "string"
+        format: "password"
+    example:
+      password: "password"
+      email: "email"
+  AuthRes:
+    type: "object"
+    properties:
+      user:
+        $ref: "#/definitions/User"
+      token:
+        type: "string"
+    example:
+      user:
+        birthday: 1
+        country: "country"
+        password: "password"
+        premium: true
+        gender: "female"
+        phone: "phone"
+        level: 3
+        surname: "surname"
+        profilePic: "http://example.com/aeiou"
+        name: "name"
+        email: "email"
+      token: "token"
+  Comment:
+    type: "object"
+    properties:
+      id:
+        type: "number"
+        format: "integer"
+        minimum: 0
+      article:
+        type: "number"
+        format: "integer"
+        minimum: 0
+      user:
+        $ref: "#/definitions/User"
+      parent:
+        $ref: "#/definitions/Comment"
+      children:
+        type: "array"
+        items:
+          $ref: "#/definitions/Comment"
+      text:
+        type: "string"
+      likesCount:
+        type: "number"
+        format: "integer"
+      commentsCount:
+        type: "number"
+        format: "integer"
+      userLike:
+        type: "boolean"
+      timestamp:
+        type: "string"
+        format: "date-time"
+    example:
+      likesCount: 5.63737665663332876420099637471139430999755859375
+      children:
+      - null
+      - null
+      commentsCount: 2.3021358869347654518833223846741020679473876953125
+      userLike: true
+      id: 0.080082819046101150206595775671303272247314453125
+      text: "text"
+      user:
+        birthday: 1
+        country: "country"
+        password: "password"
+        premium: true
+        gender: "female"
+        phone: "phone"
+        level: 3
+        surname: "surname"
+        profilePic: "http://example.com/aeiou"
+        name: "name"
+        email: "email"
+      article: 0.602745618307040320615897144307382404804229736328125
+      timestamp: "2000-01-23T04:56:07.000+00:00"
+  SMSCode:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      code:
+        type: "number"
+        format: "integer"
+    example:
+      code: 0.80082819046101150206595775671303272247314453125
+      email: "email"
+  Source:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      url:
+        type: "string"
+    example:
+      name: "name"
+      url: "url"
+  User:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      name:
+        type: "string"
+      surname:
+        type: "string"
+      password:
+        type: "string"
+        format: "password"
+      gender:
+        type: "string"
+        enum:
+        - "female"
+        - "male"
+      birthday:
+        type: "integer"
+        format: "date"
+      country:
+        type: "string"
+      phone:
+        type: "string"
+      profilePic:
+        type: "string"
+        format: "url"
+      level:
+        type: "integer"
+        minimum: 1
+        maximum: 5
+      premium:
+        type: "boolean"
+    example:
+      birthday: 1
+      country: "country"
+      password: "password"
+      premium: true
+      gender: "female"
+      phone: "phone"
+      level: 3
+      surname: "surname"
+      profilePic: "http://example.com/aeiou"
+      name: "name"
+      email: "email"
