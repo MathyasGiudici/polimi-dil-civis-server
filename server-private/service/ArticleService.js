@@ -1,126 +1,74 @@
 'use strict';
 
+var sqlDatabase;
+
+// Utils
+var {parseArticle, getArticles} = require("./utils/ArticleUtils");
+
+exports.articleInit = function(database) {
+  articleTable(database);
+}
+
+const articleTable = function(database) {
+  sqlDatabase = database;
+  sqlDatabase.schema.hasTable("articles").then( exists => {
+    if(!exists){
+      console.log("[CIVIS]: Creating articles' table");
+      sqlDatabase.schema.createTable("articles", table => {
+        table.increments("id");
+        table.text("title");
+        table.text("text");
+        table.text("topic");
+        table.integer("likesCount");
+        table.integer("commentsCount");
+        table.datetime("timestamp");
+        table.text("statistics");
+        table.boolean("isHome");
+        table.text("sourceName");
+        table.text("sourceUrl");
+      }).then( () => {
+        console.log("[CIVIS]: Filling articles' table");
+        return Promise.all(getArticles()).then( obj => {
+          return sqlDatabase("articles").insert(obj);
+        });
+      });
+    }
+    else{
+      return true;
+    }
+  });
+}
 
 /**
  *
  * returns List
  **/
 exports.article = function() {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = [ {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-}, {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-} ];
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
+  return sqlDatabase("articles").select().then(result => {
+    var array = [];
+    result.forEach((item, i) => {
+      parseArticle(item);
+    });
+    return array;
   });
 }
 
 
 /**
  *
- * id BigDecimal 
+ * id BigDecimal
  * returns Article
  **/
 exports.articleById = function(id) {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-};
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
 }
 
 
 /**
  *
- * topic String 
+ * topic String
  * returns List
  **/
 exports.articleByTopic = function(topic) {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = [ {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-}, {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-} ];
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
 }
 
 
@@ -129,107 +77,24 @@ exports.articleByTopic = function(topic) {
  * returns List
  **/
 exports.articleHome = function() {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = [ {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-}, {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-} ];
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
 }
 
 
 /**
  *
- * id BigDecimal 
+ * id BigDecimal
  * returns Article
  **/
 exports.articleLikePost = function(id) {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-};
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
 }
 
 
 /**
  *
- * id BigDecimal 
+ * id BigDecimal
  * returns Article
  **/
 exports.articleLikeRemove = function(id) {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-};
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
 }
 
 
@@ -238,42 +103,4 @@ exports.articleLikeRemove = function(id) {
  * returns List
  **/
 exports.articleRecommended = function() {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = [ {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-}, {
-  "likesCount" : 6.02745618307040320615897144307382404804229736328125,
-  "commentsCount" : 1.46581298050294517310021547018550336360931396484375,
-  "userLike" : true,
-  "topic" : "topic",
-  "id" : 0.080082819046101150206595775671303272247314453125,
-  "text" : "text",
-  "source" : {
-    "name" : "name",
-    "url" : "url"
-  },
-  "title" : "title",
-  "timestamp" : "2000-01-23T04:56:07.000+00:00",
-  "statistics" : "http://example.com/aeiou"
-} ];
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
 }
-

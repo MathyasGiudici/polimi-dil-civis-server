@@ -1,5 +1,13 @@
 'use strict';
 
+var sqlDatabase;
+
+// Utils
+// var {getSMS} = require("./utils/SmsUtils");
+
+exports.smsInit = function(database) {
+  return;
+}
 
 /**
  *
@@ -26,7 +34,7 @@ exports.getSms = function() {
 
 /**
  *
- * body SMSCode 
+ * body SMSCode
  * returns User
  **/
 exports.smsVerification = function(body) {
@@ -52,4 +60,3 @@ exports.smsVerification = function(body) {
     }
   });
 }
-

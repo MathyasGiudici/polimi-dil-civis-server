@@ -12,6 +12,9 @@ var serverPort = process.env.PORT || 8080;
 // serveStatic to change the public folder of the server
 var serveStatic = require('serve-static');
 
+// Importing initialization of the database
+var {databaseInit} = require("./server-private/service/DataService");
+
 // swaggerRouter configuration
 var options = {
   swaggerUi: path.join(__dirname, '/swagger.json'),
@@ -39,7 +42,10 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   app.use(middleware.swaggerUi());
 
   // Serve-Static folder
-  app.use(serveStatic(__dirname + "server-public"));
+  app.use(serveStatic(__dirname + "/server-public"));
+
+  // Database initialization
+  databaseInit();
 
   // Start the server
   http.createServer(app).listen(serverPort, function () {

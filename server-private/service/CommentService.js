@@ -1,9 +1,17 @@
 'use strict';
 
+var sqlDatabase;
+
+// Utils
+// var {getComments} = require("./utils/CommentUtils");
+
+exports.commentInit = function(database) {
+  return;
+}
 
 /**
  *
- * article BigDecimal 
+ * article BigDecimal
  * returns List
  **/
 exports.commentsGet = function(article) {
@@ -65,8 +73,8 @@ exports.commentsGet = function(article) {
 
 /**
  *
- * article BigDecimal 
- * body Comment 
+ * article BigDecimal
+ * body Comment
  * returns List
  **/
 exports.commentsPost = function(article,body) {
@@ -124,4 +132,3 @@ exports.commentsPost = function(article,body) {
     }
   });
 }
-

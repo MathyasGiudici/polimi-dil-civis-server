@@ -1,5 +1,43 @@
 'use strict';
 
+// Import of JWT
+const argon2 = require('argon2');
+const {generateJWT} = require('./AuthLayer');
+
+var sqlDatabase;
+
+// Utils
+var {getUsers} = require("./utils/UserUtils");
+
+exports.userInit = function(database) {
+  sqlDatabase = database;
+  sqlDatabase.schema.hasTable("users").then( exists => {
+    if(!exists){
+      console.log("[CIVIS]: Creating users' table");
+      sqlDatabase.schema.createTable("users", table => {
+        table.string("email").primary();
+        table.string("name");
+        table.string("surname");
+        table.string("password");
+        table.enum("gender",["female","male"]);
+        table.date("birthday");
+        table.string("country");
+        table.string("phone");
+        table.string("profilePic");
+        table.integer("level");
+        table.boolean("premium");
+      }).then( () => {
+        console.log("[CIVIS]: Filling users' table");
+        return Promise.all([getUsers()]).then( obj => {
+          return sqlDatabase("users").insert(obj);
+        });
+      });
+    }
+    else{
+      return true;
+    }
+  });
+}
 
 /**
  *
@@ -20,7 +58,7 @@ exports.userDelete = function() {
 
 /**
  *
- * body AuthReq 
+ * body AuthReq
  * returns AuthRes
  **/
 exports.userLogin = function(body) {
@@ -93,7 +131,7 @@ exports.userMe = function() {
 
 /**
  *
- * body User 
+ * body User
  * no response value expected for this operation
  **/
 exports.userRegistration = function(body) {
@@ -105,8 +143,8 @@ exports.userRegistration = function(body) {
 
 /**
  *
- * email String 
- * image File 
+ * email String
+ * image File
  * no response value expected for this operation
  **/
 exports.userRegistrationPicture = function(email,image) {
@@ -144,4 +182,3 @@ exports.userUpdate = function(body) {
     }
   });
 }
-
