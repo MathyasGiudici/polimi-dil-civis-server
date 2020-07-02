@@ -26,9 +26,10 @@ exports.userInit = function(database) {
         table.string("profilePic");
         table.integer("level");
         table.boolean("premium");
-      }).then( () => {
+      }).then(async function(){
         console.log("[CIVIS]: Filling users' table");
-        return Promise.all([getUsers()]).then( obj => {
+        var array = await getUsers();
+        return Promise.all(array).then( obj => {
           return sqlDatabase("users").insert(obj);
         });
       });

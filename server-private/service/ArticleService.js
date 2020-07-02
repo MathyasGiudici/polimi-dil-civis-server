@@ -3,10 +3,12 @@
 var sqlDatabase;
 
 // Utils
-var {parseArticle, getArticles} = require("./utils/ArticleUtils");
+var {parseArticle, getArticles, getRecommendations, getLikes} = require("./utils/ArticleUtils");
 
 exports.articleInit = function(database) {
   articleTable(database);
+  recTable(database);
+  likesTable(database);
 }
 
 const articleTable = function(database) {
@@ -30,6 +32,48 @@ const articleTable = function(database) {
         console.log("[CIVIS]: Filling articles' table");
         return Promise.all(getArticles()).then( obj => {
           return sqlDatabase("articles").insert(obj);
+        });
+      });
+    }
+    else{
+      return true;
+    }
+  });
+}
+
+const recTable = function(database) {
+  sqlDatabase = database;
+  sqlDatabase.schema.hasTable("recommendations").then( exists => {
+    if(!exists){
+      console.log("[CIVIS]: Creating recommendations' table");
+      sqlDatabase.schema.createTable("recommendations", table => {
+        table.integer("article");
+        table.text("user");
+      }).then( () => {
+        console.log("[CIVIS]: Filling recommendations' table");
+        return Promise.all(getRecommendations()).then( obj => {
+          return sqlDatabase("recommendations").insert(obj);
+        });
+      });
+    }
+    else{
+      return true;
+    }
+  });
+}
+
+const likesTable = function(database) {
+  sqlDatabase = database;
+  sqlDatabase.schema.hasTable("articleLikes").then( exists => {
+    if(!exists){
+      console.log("[CIVIS]: Creating articleLikes' table");
+      sqlDatabase.schema.createTable("articleLikes", table => {
+        table.integer("article");
+        table.text("user");
+      }).then( () => {
+        console.log("[CIVIS]: Filling articleLikes' table");
+        return Promise.all(getLikes()).then( obj => {
+          return sqlDatabase("articleLikes").insert(obj);
         });
       });
     }

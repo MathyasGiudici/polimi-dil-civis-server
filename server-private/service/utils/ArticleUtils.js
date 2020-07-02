@@ -15,9 +15,9 @@ exports.getArticles = function() {
       title: 'Articolo 1',
       text: 'Articolo 1 testoooooo',
       topic: 'topic1',
-      likesCount: 0,
+      likesCount: 2,
       commentsCount: 0,
-      timestamp: '2017-07-21T17:32:28Z',
+      timestamp: '2020-06-25T09:00:00Z',
       statistics: 'noUrl',
       isHome: true,
       sourceName: 'source 1',
@@ -30,24 +30,50 @@ exports.getArticles = function() {
       topic: 'topic1',
       likesCount: 0,
       commentsCount: 0,
-      timestamp: '2017-07-21T17:32:28Z',
+      timestamp: '2020-06-25T09:00:00Z',
       statistics: 'noUrl',
       isHome: false,
       sourceName: 'source 2',
       sourceUrl: 'source2url',
     },
     {
-      id: 0,
+      id: 2,
       title: 'Articolo 3',
       text: 'Articolo 3 testoooooo',
       topic: 'topic2',
       likesCount: 0,
       commentsCount: 0,
-      timestamp: '2017-07-21T17:32:28Z',
+      timestamp: '2020-06-25T09:00:00Z',
       statistics: 'noUrl',
       isHome: true,
       sourceName: 'source 3',
       sourceUrl: 'source3url',
+    }
+  ];
+}
+
+exports.getRecommendations = function() {
+  return [
+    {
+      article: 0,
+      user : "cesare@email.it",
+    },
+    {
+      article: 1,
+      user : "laura@email.it",
+    }
+  ];
+}
+
+exports.getLikes = function() {
+  return [
+    {
+      article: 0,
+      user : "cesare@email.it",
+    },
+    {
+      article: 0,
+      user : "laura@email.it",
     }
   ];
 }

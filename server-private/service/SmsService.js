@@ -3,10 +3,29 @@
 var sqlDatabase;
 
 // Utils
-// var {getSMS} = require("./utils/SmsUtils");
+var {getSMS} = require("./utils/SmsUtils");
 
 exports.smsInit = function(database) {
-  return;
+  sqlDatabase = database;
+  sqlDatabase.schema.hasTable("sms").then( exists => {
+    if(!exists){
+      console.log("[CIVIS]: Creating sms' table");
+      sqlDatabase.schema.createTable("sms", table => {
+        table.increments("id");
+        table.text("email");
+        table.integer("code");
+        table.datetime("timestamp");
+      }).then( () => {
+        console.log("[CIVIS]: Filling sms' table");
+        return Promise.all(getSMS()).then( obj => {
+          return sqlDatabase("sms").insert(obj);
+        });
+      });
+    }
+    else{
+      return true;
+    }
+  });
 }
 
 /**
