@@ -1,6 +1,6 @@
 // Import of JWT
 const argon2 = require('argon2');
-const {generateJWT} = require('../AuthLayer');
+const {generateJWT} = require('../AuthService');
 
 exports.getUsers = async function() {
   const passwordHashed = await argon2.hash("passwordSegret@123");

@@ -3,6 +3,10 @@ var ResponsePayload = function(code, payload) {
   this.payload = payload;
 }
 
+exports.unauthorizeAction = function(res){
+  writeJson(res, {response: "Unauthorized"});
+}
+
 exports.respondWithCode = function(code, payload) {
   return new ResponsePayload(code, payload);
 }

@@ -25,7 +25,22 @@ paths:
       operationId: "article"
       produces:
       - "application/json"
-      parameters: []
+      parameters:
+      - name: "offset"
+        in: "query"
+        description: "Pagination offset. Default is 0"
+        required: false
+        type: "integer"
+        default: 0
+        minimum: 0
+      - name: "limit"
+        in: "query"
+        description: "Maximum number of items per page. Default is 20 and cannot exceed\
+          \ 500"
+        required: false
+        type: "integer"
+        default: 20
+        maximum: 500
       responses:
         "200":
           description: "OK"
@@ -599,8 +614,7 @@ definitions:
         type: "string"
         format: "email"
       code:
-        type: "number"
-        format: "integer"
+        type: "string"
       timestamp:
         type: "string"
         format: "date-time"

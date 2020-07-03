@@ -3,8 +3,19 @@
 var utils = require('../utils/writer.js');
 var User = require('../service/UserService');
 
+const {decodeJWT} = require('../service/AuthService');
+
 module.exports.userDelete = function userDelete (req, res, next) {
-  User.userDelete()
+  //Extract session
+  var session = decodeJWT(req);
+
+  // Checking if it is the correct one
+  if((!session) || session.name == 'TokenExpiredError')
+  {
+    return utils.unauthorizeAction(res);
+  }
+
+  User.userDelete(session.user.email)
     .then(function (response) {
       utils.writeJson(res, response);
     })
@@ -25,17 +36,29 @@ module.exports.userLogin = function userLogin (req, res, next) {
 };
 
 module.exports.userLogout = function userLogout (req, res, next) {
-  User.userLogout()
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  //Extract session
+  var session = decodeJWT(req);
+
+  // Checking if it is the correct one
+  if((!session) || session.name == 'TokenExpiredError')
+  {
+    return utils.unauthorizeAction(res);
+  }
+
+  utils.writeJson(res, {response: "Successful logout"});
 };
 
 module.exports.userMe = function userMe (req, res, next) {
-  User.userMe()
+  //Extract session
+  var session = decodeJWT(req);
+
+  // Checking if it is the correct one
+  if((!session) || session.name == 'TokenExpiredError')
+  {
+    return utils.unauthorizeAction(res);
+  }
+
+  User.userMe(session.user.email)
     .then(function (response) {
       utils.writeJson(res, response);
     })
@@ -68,7 +91,21 @@ module.exports.userRegistrationPicture = function userRegistrationPicture (req, 
 };
 
 module.exports.userUpdate = function userUpdate (req, res, next) {
+  //Extract session
+  var session = decodeJWT(req);
+
+  // Checking if it is the correct one
+  if((!session) || session.name == 'TokenExpiredError')
+  {
+    return utils.unauthorizeAction(res);
+  }
+
   var body = req.swagger.params['body'].value;
+
+  // Checking not fake modification
+  if(session.user.email != body.email)
+    return utils.unauthorizeAction(res);
+
   User.userUpdate(body)
     .then(function (response) {
       utils.writeJson(res, response);

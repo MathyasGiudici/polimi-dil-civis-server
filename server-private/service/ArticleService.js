@@ -87,7 +87,14 @@ const likesTable = function(database) {
  *
  * returns List
  **/
-exports.article = function() {
+exports.article = function(email) {
+  var promise = new Promise(function(resolve, reject) {
+    if(email != '')
+      resolve(false);
+    //return sqlDatabase("likesTable").where("email",email).select().then(result => {
+  });
+
+
   return sqlDatabase("articles").select().then(result => {
     var array = [];
     result.forEach((item, i) => {

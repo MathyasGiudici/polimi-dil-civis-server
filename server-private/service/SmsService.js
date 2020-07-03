@@ -11,9 +11,8 @@ exports.smsInit = function(database) {
     if(!exists){
       console.log("[CIVIS]: Creating sms' table");
       sqlDatabase.schema.createTable("sms", table => {
-        table.increments("id");
         table.text("email");
-        table.integer("code");
+        table.text("code");
         table.datetime("timestamp");
       }).then( () => {
         console.log("[CIVIS]: Filling sms' table");
@@ -33,21 +32,7 @@ exports.smsInit = function(database) {
  * returns List
  **/
 exports.getSms = function() {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = [ {
-  "code" : 0.80082819046101150206595775671303272247314453125,
-  "email" : "email"
-}, {
-  "code" : 0.80082819046101150206595775671303272247314453125,
-  "email" : "email"
-} ];
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
+  return sqlDatabase("sms").select();
 }
 
 
@@ -56,26 +41,42 @@ exports.getSms = function() {
  * body SMSCode
  * returns User
  **/
-exports.smsVerification = function(body) {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-  "birthday" : 1,
-  "country" : "country",
-  "password" : "password",
-  "premium" : true,
-  "gender" : "female",
-  "phone" : "phone",
-  "level" : 3,
-  "surname" : "surname",
-  "profilePic" : "http://example.com/aeiou",
-  "name" : "name",
-  "email" : "email"
-};
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
+exports.smsVerification = async function(body) {
+  var promise = new Promise(function(resolve, reject) {
+    return sqlDatabase("sms").where("email",body.email).select().then( data => {
+      if(data.length > 0){
+          if(body.code == data[0].code)
+            resolve(true);
+          else
+            response(false);
+      }
+      else {
+        response(false);
+      }
+    });
+  });
+
+  var codeCheck = await promise;
+
+  if(!codeCheck)
+    return {response: "Something got wrong. Check the code!"};
+
+  promise = new Promise(function(resolve, reject) {
+    return sqlDatabase("users").where("email",body.email).select().then(
+      data => { resolve(data[0]);});
+  });
+
+  var user = await promise;
+
+  user.verify = true;
+
+  return sqlDatabase("users").where("email",user.email).update(user).then( data => {
+     return sqlDatabase("users").where("email",user.email).select().then(
+        data => {
+          return data.map( e => {
+             delete e.password;
+             return e;
+          });
+        }).then( data => {return data[0];});
   });
 }
