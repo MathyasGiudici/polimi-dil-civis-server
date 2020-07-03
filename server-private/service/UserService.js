@@ -64,7 +64,7 @@ exports.userDelete = function(email) {
  * body AuthReq
  * returns AuthRes
  **/
-exports.userLogin = function(body) {
+exports.userLogin = async function(body) {
   return sqlDatabase("users").where("email",body.email).select().then(async function(data) {
       // Checking if the user exists
       if(data.length == 0)
@@ -108,7 +108,7 @@ exports.userMe = function(email) {
  * body User
  * no response value expected for this operation
  **/
-exports.userRegistration = function(body) {
+exports.userRegistration = async function(body) {
   return sqlDatabase("users").where("email",body.email).select().then(async function(data) {
     // Checking if the user exists
     if(data.length != 0)
@@ -155,7 +155,7 @@ exports.userRegistration = function(body) {
  * image File
  * no response value expected for this operation
  **/
-exports.userRegistrationPicture = function(email,image,req) {
+exports.userRegistrationPicture = async function(email,image,req) {
   // Checking if the user is in the database
   var promise = new Promise(function(resolve, reject){
     return sqlDatabase("users").where("email",email).select().then(
@@ -193,7 +193,7 @@ exports.userRegistrationPicture = function(email,image,req) {
  * body User New user informations. If password is empty the server know that you do not want to change your password
  * returns User
  **/
-exports.userUpdate = function(body) {
+exports.userUpdate = async function(body) {
   // Checking if the password must be changhed or not
   if(body.password != ""){
     const passwordHashed = await argon2.hash(body.password);

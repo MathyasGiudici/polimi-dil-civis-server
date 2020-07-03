@@ -4,7 +4,9 @@ var utils = require('../utils/writer.js');
 var Article = require('../service/ArticleService');
 
 module.exports.article = function article (req, res, next) {
-  Article.article()
+  var offset = req.swagger.params['offset'].value;
+  var limit = req.swagger.params['limit'].value;
+  Article.article(offset,limit)
     .then(function (response) {
       utils.writeJson(res, response);
     })

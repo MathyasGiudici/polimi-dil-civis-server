@@ -83,24 +83,49 @@ const likesTable = function(database) {
   });
 }
 
+const getUserLike = async function (article,email) {
+  var promise = new Promise(function(resolve, reject) {
+    if(email == '')
+      resolve(false);
+    else
+      return sqlDatabase("articleLikes").where("user",email).where("article",article).select().then(result => {
+        if(result.length != 0)
+          resolve(true);
+        else
+          resolve(false);
+      });
+  });
+
+  var result = await promise;
+  return result;
+}
+
+const getArticle = async function (id,email) {
+  var promise = new Promise(function(resolve, reject) {
+    sqlDatabase("articles").where("id",id).select().then(result => {
+      result.forEach((item, i) => {
+        parseArticle(item);
+        item.userLike = getUserLike(item.id,email);
+      });
+      resolve(result[0]);
+    });
+  });
+
+  var result = await promise;
+  return result;
+}
+
 /**
  *
  * returns List
  **/
-exports.article = function(email) {
-  var promise = new Promise(function(resolve, reject) {
-    if(email != '')
-      resolve(false);
-    //return sqlDatabase("likesTable").where("email",email).select().then(result => {
-  });
-
-
-  return sqlDatabase("articles").select().then(result => {
-    var array = [];
+exports.article = function(offset,limit,email) {
+  return sqlDatabase("articles").limit(limit).offset(offset).select().then(result => {
     result.forEach((item, i) => {
       parseArticle(item);
+      item.userLike = getUserLike(item.id,email);
     });
-    return array;
+    return result;
   });
 }
 
@@ -110,7 +135,8 @@ exports.article = function(email) {
  * id BigDecimal
  * returns Article
  **/
-exports.articleById = function(id) {
+exports.articleById = function(id,email) {
+  return getArticle(id,email);
 }
 
 
@@ -119,7 +145,14 @@ exports.articleById = function(id) {
  * topic String
  * returns List
  **/
-exports.articleByTopic = function(topic) {
+exports.articleByTopic = function(topic,email) {
+  return sqlDatabase("articles").where("topic",topic).select().then(result => {
+    result.forEach((item, i) => {
+      parseArticle(item);
+      item.userLike = getUserLike(item.id,email);
+    });
+    return result;
+  });
 }
 
 
@@ -127,7 +160,14 @@ exports.articleByTopic = function(topic) {
  *
  * returns List
  **/
-exports.articleHome = function() {
+exports.articleHome = function(email) {
+  return sqlDatabase("articles").where("isHome",true).select().then(result => {
+    result.forEach((item, i) => {
+      parseArticle(item);
+      item.userLike = getUserLike(item.id,email);
+    });
+    return result;
+  });
 }
 
 
@@ -136,7 +176,19 @@ exports.articleHome = function() {
  * id BigDecimal
  * returns Article
  **/
-exports.articleLikePost = function(id) {
+exports.articleLikePost = async function(id,email) {
+  var article =  getArticle(id,email);
+  var alreadyLiked = getUserLike(id,email);
+
+  if(alreadyLiked)
+    return article;
+
+  article.likesCount += 1;
+
+  await sqlDatabase("articles").where("id",article.id).update(article);
+  await sqlDatabase("articleLikes").insert({article:article.id,user:email});
+
+  return article;
 }
 
 
@@ -145,7 +197,19 @@ exports.articleLikePost = function(id) {
  * id BigDecimal
  * returns Article
  **/
-exports.articleLikeRemove = function(id) {
+exports.articleLikeRemove = function(id,email) {
+  var article =  getArticle(id,email);
+  var alreadyLiked = getUserLike(id,email);
+
+  if(!alreadyLiked)
+    return article;
+
+  article.likesCount -= 1;
+
+  await sqlDatabase("articles").where("id",article.id).update(article);
+  await sqlDatabase("articleLikes").where("user",email).where("article",id).del();
+
+  return article;
 }
 
 
@@ -153,5 +217,21 @@ exports.articleLikeRemove = function(id) {
  *
  * returns List
  **/
-exports.articleRecommended = function() {
+exports.articleRecommended = async function(email) {
+  var promise = new Promise(function(resolve, reject) {
+    return sqlDatabase("recommendations").where("user",email).select().then(
+      result => {
+        resolve(result.map( x => x.article));
+      }
+    )
+
+  var articles = await promise;
+
+  return sqlDatabase("articles").whereIn("id",articles).select().then(result => {
+    result.forEach((item, i) => {
+      parseArticle(item);
+      item.userLike = getUserLike(item.id,email);
+    });
+    return result;
+  });
 }
