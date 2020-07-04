@@ -104,7 +104,6 @@ const getArticle = async function (id,email) {
   var promise = new Promise(function(resolve, reject) {
     sqlDatabase("articles").where("id",id).select().then(result => {
       result.forEach((item, i) => {
-        parseArticle(item);
         item.userLike = getUserLike(item.id,email);
       });
       resolve(result[0]);
@@ -136,7 +135,7 @@ exports.article = function(offset,limit,email) {
  * returns Article
  **/
 exports.articleById = function(id,email) {
-  return getArticle(id,email);
+  return parseArticle(getArticle(id,email);
 }
 
 
@@ -188,7 +187,9 @@ exports.articleLikePost = async function(id,email) {
   await sqlDatabase("articles").where("id",article.id).update(article);
   await sqlDatabase("articleLikes").insert({article:article.id,user:email});
 
-  return article;
+  article.userLike = true;
+
+  return parseArticle(article);
 }
 
 
@@ -209,7 +210,9 @@ exports.articleLikeRemove = function(id,email) {
   await sqlDatabase("articles").where("id",article.id).update(article);
   await sqlDatabase("articleLikes").where("user",email).where("article",id).del();
 
-  return article;
+  article.userLike = false;
+
+  return parseArticle(article);
 }
 
 
