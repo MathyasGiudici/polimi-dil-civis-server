@@ -84,34 +84,28 @@ const likesTable = function(database) {
 }
 
 const getUserLike = async function (article,email) {
-  var promise = new Promise(function(resolve, reject) {
+  return new Promise(async function(resolve, reject) {
     if(email == '')
       resolve(false);
     else
-      return sqlDatabase("articleLikes").where("user",email).where("article",article).select().then(result => {
+      await sqlDatabase("articleLikes").where("user",email).where("article",article).select().then(result => {
         if(result.length != 0)
           resolve(true);
         else
           resolve(false);
       });
   });
-
-  var result = await promise;
-  return result;
 }
 
 const getArticle = async function (id,email) {
-  var promise = new Promise(function(resolve, reject) {
-    sqlDatabase("articles").where("id",id).select().then(result => {
-      result.forEach((item, i) => {
-        item.userLike = getUserLike(item.id,email);
+  return new Promise(function(resolve, reject) {
+    sqlDatabase("articles").where("id",id).select().then(async function(result) {
+      await result.forEach(async function(item, i) {
+        item.userLike = await getUserLike(item.id,email);
       });
       resolve(result[0]);
     });
   });
-
-  var result = await promise;
-  return result;
 }
 
 /**
@@ -119,10 +113,10 @@ const getArticle = async function (id,email) {
  * returns List
  **/
 exports.article = function(offset,limit,email) {
-  return sqlDatabase("articles").limit(limit).offset(offset).select().then(result => {
-    result.forEach((item, i) => {
+  return sqlDatabase("articles").limit(limit).offset(offset).select().then(async function(result) {
+    await result.forEach(async function(item, i){
+      item.userLike = await getUserLike(item.id,email);
       parseArticle(item);
-      item.userLike = getUserLike(item.id,email);
     });
     return result;
   });
@@ -134,8 +128,10 @@ exports.article = function(offset,limit,email) {
  * id BigDecimal
  * returns Article
  **/
-exports.articleById = function(id,email) {
-  return parseArticle(getArticle(id,email));
+exports.articleById = async function(id,email) {
+  let article = await getArticle(id,email)
+  parseArticle(article);
+  return article;
 }
 
 
@@ -145,10 +141,10 @@ exports.articleById = function(id,email) {
  * returns List
  **/
 exports.articleByTopic = function(topic,email) {
-  return sqlDatabase("articles").where("topic",topic).select().then(result => {
-    result.forEach((item, i) => {
+  return sqlDatabase("articles").where("topic",topic).select().then(async function(result) {
+    await result.forEach(async function(item, i) {
+      item.userLike = await getUserLike(item.id,email);
       parseArticle(item);
-      item.userLike = getUserLike(item.id,email);
     });
     return result;
   });
@@ -160,10 +156,10 @@ exports.articleByTopic = function(topic,email) {
  * returns List
  **/
 exports.articleHome = function(email) {
-  return sqlDatabase("articles").where("isHome",true).select().then(result => {
-    result.forEach((item, i) => {
+  return sqlDatabase("articles").where("isHome",true).select().then(async function(result) {
+    await result.forEach(async function(item, i) {
+      item.userLike = await getUserLike(item.id,email);
       parseArticle(item);
-      item.userLike = getUserLike(item.id,email);
     });
     return result;
   });
@@ -230,10 +226,10 @@ exports.articleRecommended = async function(email) {
 
   var articles = await promise;
 
-  return sqlDatabase("articles").whereIn("id",articles).select().then(result => {
-    result.forEach((item, i) => {
+  return sqlDatabase("articles").whereIn("id",articles).select().then(async function(result) {
+    await result.forEach(async function(item, i) {
+      item.userLike = await getUserLike(item.id,email);
       parseArticle(item);
-      item.userLike = getUserLike(item.id,email);
     });
     return result;
   });

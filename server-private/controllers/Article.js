@@ -125,13 +125,12 @@ module.exports.articleLikeRemove = function articleLikeRemove (req, res, next) {
 module.exports.articleRecommended = function articleRecommended (req, res, next) {
   //Extract session
   var session = decodeJWT(req);
-  var email = '';
 
   // Checking if it is the correct one
-  if((session) && session.name != 'TokenExpiredError')
-    email = session.user.email;
+  if((!session) || session.name == 'TokenExpiredError')
+    return utils.unauthorizeAction(res);
 
-  Article.articleRecommended(email)
+  Article.articleRecommended(session.user.email)
     .then(function (response) {
       utils.writeJson(res, response);
     })

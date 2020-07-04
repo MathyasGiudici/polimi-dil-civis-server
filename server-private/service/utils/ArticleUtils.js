@@ -6,6 +6,7 @@ exports.parseArticle = function (article) {
   // Deleting table attributes
   delete article.sourceName;
   delete article.sourceUrl;
+  delete article.isHome;
 }
 
 exports.getArticles = function() {

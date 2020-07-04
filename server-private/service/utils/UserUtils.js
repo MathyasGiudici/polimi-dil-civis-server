@@ -7,6 +7,7 @@ exports.getUsers = async function() {
   return [
     {
       email : "cesare@email.it",
+      verify: true,
       name : "Cesare",
       surname : "Galli",
       password : passwordHashed,
@@ -20,6 +21,7 @@ exports.getUsers = async function() {
     },
     {
       email : "laura@email.it",
+      verify: true,
       name : "Laura",
       surname : "Basile",
       password : passwordHashed,

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 var fs = require('fs');
 
 // This is my important secret
-const signature = "g3zgsujBliMsjpnFOkKAwteSQ72VEwrF";
+const signature = "g7zgsujGliMsjpnFOkKGwteSQ7TVEwrF";
 
 // Function to create the token
 exports.generateJWT = function(user){
@@ -15,31 +15,24 @@ exports.generateJWT = function(user){
 
 // Function to get the token from the header
 const getTokenFromHeader = (req) => {
-  try {
-      let r = req.headers.authorization.split(' ')[1];
-      return r;
-  } catch (e) {
-    console.log(e);
+  if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+    return req.headers.authorization.split(' ')[1];
+  }
+  else{
+    return jwt.sign({data: 'TokenExpiredError'}, signature)
   }
 }
 
 // Function to decode the token
 exports.decodeJWT = (req) => {
-  try{
-    var decoded = jwt.verify(getTokenFromHeader(req), signature,
-      function(err,verifiedJwt){
-        if(err){
-          console.log(err); // Token has expired, has been tampered with, etc
-          return 'TokenExpiredError';
-        } else {
-          console.log(verifiedJwt); // Will contain the header and body
-          return {
-            user: JSON.parse(verifiedJwt.data),
-            token: getTokenFromHeader(req)
-          };
-        }
-      });
-  }catch(e){
-    console.log(e);
-  }
+  var decoded = jwt.verify(getTokenFromHeader(req), signature);
+
+  // Handling expiration
+  if(decoded.data == 'TokenExpiredError')
+    return {name:'TokenExpiredError'};
+
+  return {
+    user: JSON.parse(decoded.data),
+    token: getTokenFromHeader(req)
+  };
 }
