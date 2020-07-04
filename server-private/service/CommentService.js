@@ -58,7 +58,7 @@ const likesTable = function(database) {
   });
 }
 
-const getSimpleUser = function (email) {
+const getSimpleUser = async function (email) {
   var promise = new Promise(function(resolve, reject) {
     return sqlDatabase("users").where("email",email).select().then(
       data => {
@@ -89,6 +89,10 @@ const getUserLike = async function (comment,email) {
       });
   });
 
+  var result = await promise;
+  return result;
+}
+
 const getArticle = async function (id,email) {
   var promise = new Promise(function(resolve, reject) {
     sqlDatabase("articles").where("id",id).select().then(result => {
@@ -116,7 +120,7 @@ const getComment = async function (id) {
  * id BigDecimal
  * returns Comment
  **/
-exports.commentLikePost = function(id,email) {
+exports.commentLikePost = async function(id,email) {
   var comment =  getComment(id);
   var alreadyLiked = getUserLike(id,email);
 
@@ -145,7 +149,7 @@ exports.commentLikePost = function(id,email) {
  * id BigDecimal
  * returns Comment
  **/
-exports.commentLikeRemove = function(id,email) {
+exports.commentLikeRemove = async function(id,email) {
   var comment =  getComment(id);
   var alreadyLiked = getUserLike(id,email);
 
@@ -235,24 +239,24 @@ exports.commentsPost = async function(article,body) {
     var article =  getArticle(id);
     article.commentsCount += 1;
 
-    await sqlDatabase("articles").where("id",article.id).update(article);
+    return sqlDatabase("articles").where("id",article.id).update(article);
   });
 
   await promise;
 
   if(body.parent != -1){
-    var promise =  new Promise(async function(resolve, reject) {
+    promise =  new Promise(function(resolve, reject) {
       var comment = getComment(body.parent);
       comment.commentsCount += 1;
 
-      await sqlDatabase("comments").where("id",comment.id).update(comment);
+      return sqlDatabase("comments").where("id",comment.id).update(comment);
     });
 
     await promise;
   }
 
   return sqlDatabase("comments").insert(body).then(result => {
-    result.user = getSimpleUser(result.user)
+    result.user = getSimpleUser(result.user);
     topItem.children = [];
     topItem.userLike = false;
   });

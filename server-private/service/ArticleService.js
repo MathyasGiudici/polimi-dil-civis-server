@@ -135,7 +135,7 @@ exports.article = function(offset,limit,email) {
  * returns Article
  **/
 exports.articleById = function(id,email) {
-  return parseArticle(getArticle(id,email);
+  return parseArticle(getArticle(id,email));
 }
 
 
@@ -198,7 +198,7 @@ exports.articleLikePost = async function(id,email) {
  * id BigDecimal
  * returns Article
  **/
-exports.articleLikeRemove = function(id,email) {
+exports.articleLikeRemove = async function(id,email) {
   var article =  getArticle(id,email);
   var alreadyLiked = getUserLike(id,email);
 
@@ -226,7 +226,7 @@ exports.articleRecommended = async function(email) {
       result => {
         resolve(result.map( x => x.article));
       }
-    )
+    )});
 
   var articles = await promise;
 
