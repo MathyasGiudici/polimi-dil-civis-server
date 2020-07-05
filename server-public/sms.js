@@ -1,6 +1,8 @@
 $(document).ready(function () {
+  var protocol = window.location.protocol + '//';
+  var baseUrl = protocol + window.location.hostname + ':' + window.location.port;
   $.ajax({
-    url: 'https://polimi-dil-civis.herokuapp.com/api/sms',
+    url: baseUrl + '/api/sms',
     dataType: 'json',
     success:function(data){
         // Removing all elements
@@ -8,7 +10,6 @@ $(document).ready(function () {
 
         // Creating the table
         data.forEach((item, i) => {
-          console.log(item);
           var parsed = '<tr><td>';
           parsed += item.email + '</td><td>';
           parsed += item.code + '</td><td>';
