@@ -14,6 +14,7 @@ var database;
 console.log(__dirname);
 
 const parametersDebug = {
+  debug: true,
   client: 'pg',
   version: '12.3',
   connection: {
@@ -25,7 +26,7 @@ const parametersDebug = {
 };
 
 const parametersServer = {
-  debug: true,
+  debug: false,
   client: "pg",
   connection: process.env.DATABASE_URL ,
   ssl: true

@@ -100,9 +100,7 @@ const getUserLike = async function (article,email) {
 const getArticle = async function (id,email) {
   return new Promise(function(resolve, reject) {
     sqlDatabase("articles").where("id",id).select().then(async function(result) {
-      await result.forEach(async function(item, i) {
-        item.userLike = await getUserLike(item.id,email);
-      });
+      result[0].userLike = await getUserLike(result[0].id,email);
       resolve(result[0]);
     });
   });
@@ -114,10 +112,10 @@ const getArticle = async function (id,email) {
  **/
 exports.article = function(offset,limit,email) {
   return sqlDatabase("articles").limit(limit).offset(offset).select().then(async function(result) {
-    await result.forEach(async function(item, i){
-      item.userLike = await getUserLike(item.id,email);
-      parseArticle(item);
-    });
+    for(var i=0; i < result.length; i++){
+      result[i].userLike = await getUserLike(result[i].id,email);
+      parseArticle(result[i]);
+    }
     return result;
   });
 }
@@ -142,10 +140,10 @@ exports.articleById = async function(id,email) {
  **/
 exports.articleByTopic = function(topic,email) {
   return sqlDatabase("articles").where("topic",topic).select().then(async function(result) {
-    await result.forEach(async function(item, i) {
-      item.userLike = await getUserLike(item.id,email);
-      parseArticle(item);
-    });
+    for(var i=0; i < result.length; i++){
+      result[i].userLike = await getUserLike(result[i].id,email);
+      parseArticle(result[i]);
+    }
     return result;
   });
 }
@@ -157,10 +155,10 @@ exports.articleByTopic = function(topic,email) {
  **/
 exports.articleHome = function(email) {
   return sqlDatabase("articles").where("isHome",true).select().then(async function(result) {
-    await result.forEach(async function(item, i) {
-      item.userLike = await getUserLike(item.id,email);
-      parseArticle(item);
-    });
+    for(var i=0; i < result.length; i++){
+      result[i].userLike = await getUserLike(result[i].id,email);
+      parseArticle(result[i]);
+    }
     return result;
   });
 }
@@ -172,12 +170,15 @@ exports.articleHome = function(email) {
  * returns Article
  **/
 exports.articleLikePost = async function(id,email) {
-  var article =  getArticle(id,email);
-  var alreadyLiked = getUserLike(id,email);
+  var article =  await getArticle(id,email);
+  var alreadyLiked = await getUserLike(id,email);
 
-  if(alreadyLiked)
+  if(alreadyLiked){
+    parseArticle(article);
     return article;
+  }
 
+  delete article.userLike;
   article.likesCount += 1;
 
   await sqlDatabase("articles").where("id",article.id).update(article);
@@ -185,7 +186,8 @@ exports.articleLikePost = async function(id,email) {
 
   article.userLike = true;
 
-  return parseArticle(article);
+  parseArticle(article);
+  return article;
 }
 
 
@@ -195,12 +197,18 @@ exports.articleLikePost = async function(id,email) {
  * returns Article
  **/
 exports.articleLikeRemove = async function(id,email) {
-  var article =  getArticle(id,email);
-  var alreadyLiked = getUserLike(id,email);
+  var article =  await getArticle(id,email);
+  var alreadyLiked = await getUserLike(id,email);
 
-  if(!alreadyLiked)
+  if(article==null)
+    return {};
+
+  if(!alreadyLiked){
+    parseArticle(article);
     return article;
+  }
 
+  delete article.userLike;
   article.likesCount -= 1;
 
   await sqlDatabase("articles").where("id",article.id).update(article);
@@ -208,7 +216,8 @@ exports.articleLikeRemove = async function(id,email) {
 
   article.userLike = false;
 
-  return parseArticle(article);
+  parseArticle(article);
+  return article;
 }
 
 
@@ -227,10 +236,10 @@ exports.articleRecommended = async function(email) {
   var articles = await promise;
 
   return sqlDatabase("articles").whereIn("id",articles).select().then(async function(result) {
-    await result.forEach(async function(item, i) {
-      item.userLike = await getUserLike(item.id,email);
-      parseArticle(item);
-    });
+    for(var i=0; i < result.length; i++){
+      result[i].userLike = await getUserLike(result[i].id,email);
+      parseArticle(result[i]);
+    }
     return result;
   });
 }
