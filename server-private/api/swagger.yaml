@@ -280,7 +280,7 @@ paths:
           description: "Unauthorized"
         "404":
           description: "Not Found"
-      x-swagger-router-controller: "Article"
+      x-swagger-router-controller: "Comment"
     delete:
       tags:
       - "comment"

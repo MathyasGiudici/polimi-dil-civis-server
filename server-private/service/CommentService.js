@@ -109,11 +109,11 @@ const getComment = async function (id) {
  * returns Comment
  **/
 exports.commentLikePost = async function(id,email) {
-  var comment =  getComment(id);
-  var alreadyLiked = getUserLike(id,email);
+  var comment =  await getComment(id);
+  var alreadyLiked = await getUserLike(id,email);
 
   if(alreadyLiked){
-    comment.user = getSimpleUser(comment.user)
+    comment.user = await getSimpleUser(comment.user)
     comment.children = [];
     comment.userLike = true;
     return comment;
@@ -124,7 +124,7 @@ exports.commentLikePost = async function(id,email) {
   await sqlDatabase("comments").where("id",comment.id).update(comment);
   await sqlDatabase("commentLikes").insert({comment:comment.id,user:email});
 
-  omment.user = getSimpleUser(comment.user)
+  comment.user = await getSimpleUser(comment.user)
   comment.children = [];
   comment.userLike = true;
 
@@ -138,11 +138,11 @@ exports.commentLikePost = async function(id,email) {
  * returns Comment
  **/
 exports.commentLikeRemove = async function(id,email) {
-  var comment =  getComment(id);
-  var alreadyLiked = getUserLike(id,email);
+  var comment =  await getComment(id);
+  var alreadyLiked = await getUserLike(id,email);
 
   if(!alreadyLiked){
-    comment.user = getSimpleUser(comment.user)
+    comment.user = await getSimpleUser(comment.user)
     comment.children = [];
     comment.userLike = false;
     return comment;
@@ -153,7 +153,7 @@ exports.commentLikeRemove = async function(id,email) {
   await sqlDatabase("comments").where("id",comment.id).update(comment);
   await sqlDatabase("commentLikes").where("user",email).where("comment",id).del();
 
-  comment.user = getSimpleUser(comment.user)
+  comment.user = await getSimpleUser(comment.user)
   comment.children = [];
   comment.userLike = false;
 
