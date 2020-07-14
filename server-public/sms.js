@@ -10,10 +10,11 @@ $(document).ready(function () {
 
         // Creating the table
         data.forEach((item, i) => {
+          var date = new Date(item.timestamp);
           var parsed = '<tr><td>';
           parsed += item.email + '</td><td>';
           parsed += item.code + '</td><td>';
-          parsed += item.timestamp + '</td></tr>';
+          parsed += date.toUTCString() + '</td></tr>';
           $('#tableBody').append(parsed);
         });
       },
