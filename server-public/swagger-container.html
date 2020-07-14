@@ -2,7 +2,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>CIVIS | The new Agorà</title>
+  <title>Sms Verification - CIVIS | The new Agorà</title>
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
@@ -18,12 +18,12 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
+          <li class="nav-item">
             <a class="nav-link" href="index.html">Home
               <span class="sr-only">(current)</span>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item active">
             <a class="nav-link" href="swagger-container.html">SwaggerUI</a>
           </li>
           <li class="nav-item">
@@ -35,22 +35,16 @@
   </nav>
 
   <!-- Page Content -->
-  <section>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8">
-          <h1 class="mt-5">CIVIS | The new Agorà</h1>
-          <p>If you see this message, <i>polimi-dil-civis</i> server is online!<br/></p>
-          <a class="btn btn-secondary" href="swagger-container.html" role="button">Go to SwaggerUI</a>
-          <a class="btn btn-primary" href="sms.html" role="button">Go to SMS Verification</a>
-        </div>
-      </div>
-    </div>
-  </section>
+  <iframe src="docs" width="100%" height="100%"></iframe>
+
 
   <!-- Bootstrap core JavaScript -->
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Custom JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="sms.js"></script>
 
 </body>
 </html>

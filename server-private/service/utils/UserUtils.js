@@ -2,6 +2,14 @@
 const argon2 = require('argon2');
 const {generateJWT} = require('../AuthService');
 
+exports.parseUser = function(user) {
+  delete user.verify;
+  delete user.password;
+  user.birthday = user.birthday.toISOString().split('T')[0];
+  console.log(user);
+  return user;
+}
+
 exports.getUsers = async function() {
   const passwordHashed = await argon2.hash("passwordSegret@123");
   return [

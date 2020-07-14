@@ -237,11 +237,6 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "article"
-        in: "query"
-        required: true
-        type: "number"
-        format: "integer"
       - in: "body"
         name: "body"
         required: true
@@ -613,9 +608,12 @@ definitions:
         format: "integer"
         minimum: 0
       user:
-        $ref: "#/definitions/User"
+        type: "string"
+        format: "email"
       parent:
-        $ref: "#/definitions/Comment"
+        type: "number"
+        format: "integer"
+        minimum : -1
       children:
         type: "array"
         items:

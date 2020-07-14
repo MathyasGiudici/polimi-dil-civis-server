@@ -59,8 +59,8 @@ const likesTable = function(database) {
 }
 
 const getSimpleUser = async function (email) {
-  var promise = new Promise(function(resolve, reject) {
-    return sqlDatabase("users").where("email",email).select().then(
+  return new Promise(async function(resolve, reject) {
+    sqlDatabase("users").where("email",email).select().then(
       data => {
         var simple = {};
         simple.email = data[0].email;
@@ -68,51 +68,39 @@ const getSimpleUser = async function (email) {
         simple.surname = data[0].surname;
         simple.level = data[0].level;
         simple.profilePic = data[0].profilePic;
-        return simple;
+        resolve(simple);
       });
   });
-
-  var user = await promise;
-  return user;
 }
 
 const getUserLike = async function (comment,email) {
-  var promise = new Promise(function(resolve, reject) {
+  return new Promise(async function(resolve, reject) {
     if(email == '')
       resolve(false);
     else
-      return sqlDatabase("commentLikes").where("user",email).where("comment",comment).select().then(result => {
+      await sqlDatabase("commentLikes").where("user",email).where("comment",comment).select().then(result => {
         if(result.length != 0)
           resolve(true);
         else
           resolve(false);
       });
   });
-
-  var result = await promise;
-  return result;
 }
 
-const getArticle = async function (id,email) {
-  var promise = new Promise(function(resolve, reject) {
-    sqlDatabase("articles").where("id",id).select().then(result => {
+const getArticle = async function (id) {
+  return new Promise(async function(resolve, reject) {
+    await sqlDatabase("articles").where("id",id).select().then(result => {
       resolve(result[0]);
     });
   });
-
-  var result = await promise;
-  return result;
 }
 
 const getComment = async function (id) {
-  var promise = new Promise(function(resolve, reject) {
-    sqlDatabase("comments").where("id",id).select().then(result => {
+  return new Promise(async function(resolve, reject) {
+    await sqlDatabase("comments").where("id",id).select().then(result => {
       resolve(result[0]);
     });
   });
-
-  var result = await promise;
-  return result;
 }
 
 /**
@@ -165,7 +153,7 @@ exports.commentLikeRemove = async function(id,email) {
   await sqlDatabase("comments").where("id",comment.id).update(comment);
   await sqlDatabase("commentLikes").where("user",email).where("comment",id).del();
 
-  omment.user = getSimpleUser(comment.user)
+  comment.user = getSimpleUser(comment.user)
   comment.children = [];
   comment.userLike = false;
 
@@ -178,44 +166,51 @@ exports.commentLikeRemove = async function(id,email) {
  * returns List
  **/
 exports.commentsGet = function(article,email) {
-  return sqlDatabase("comments").where("article",article).select().then(data => {
-    var usersId = new Set();
+  return sqlDatabase("comments").where("article",article).select().then(async function(data){
+    var usersId = new Set([]);
     var top = [];
     var bottom = [];
 
     // Looping on comments
     data.forEach((item, i) => {
+      // Creating users
+      usersId.add(item.user);
       // Splitting comments
       if(item.parent == -1)
         top.push(item);
       else
         bottom.push(item);
-
-      // Creating users
-      usersId.add(item.user);
     });
 
     // Looking for users
-    userId = [...userId];
+    usersId = [...usersId];
     var user = [];
 
-    userId.forEach((item, i) => {
-      user.push(getSimpleUser(item));
-    });
+    for(let i=0; i < usersId.length; i++){
+      let obj = await getSimpleUser(usersId[i]);
+      user.push(obj);
+    }
 
-    top.forEach((topItem, i) => {
-      topItem.user = user[userId.indexOf(topItem.user)];
+    for(let i=0; i < top.length; i++){
+      console.log("here");
+      var topItem = top[i];
+      topItem.user = user[usersId.indexOf(topItem.user)];
       topItem.children = [];
-      topItem.userLike = getUserLike(topItem.id,email);
+      topItem.userLike = await getUserLike(topItem.id,email);
 
-      bottom.forEach((bottomItem, i) => {
-        bottomItem.userLike = getUserLike(bottomItem.id,email);
-        bottomItem.user = user[userId.indexOf(bottomItem.user)];
+      console.log(bottom);
+      for(let j=0; j < bottom.length; j++){
+        var bottomItem = bottom[j];
+        console.log(bottomItem);
+        bottomItem.user = user[usersId.indexOf(bottomItem.user)];
+        bottomItem.userLike = await getUserLike(bottomItem.id,email);
 
-        if(bottomItem.parent = topItem.id)
+        if(bottomItem.parent == topItem.id)
           topItem.children.push(bottomItem);
-      });
-    });
+      }
+    }
+
+    console.log(top);
 
     return top;
   });
@@ -228,36 +223,54 @@ exports.commentsGet = function(article,email) {
  * body Comment
  * returns List
  **/
-exports.commentsPost = async function(article,body) {
+exports.commentsPost = async function(body) {
+  // Dropping useless variables
   delete body.children;
   delete body.userLike;
+  // Initialize parameters
   body.likesCount = 0;
   body.commentsCount = 0;
-  body.user = body.user.email;
 
-  var promise =  new Promise(async function(resolve, reject) {
-    var article =  getArticle(id);
+  // Checking the ID (find the max)
+  var promise = new Promise(async function(resolve, reject) {
+    await sqlDatabase("comments").max('id as maxId').first().then(maxIdQuery => {
+      resolve(maxIdQuery.maxId);
+    });
+  });
+
+  var max = await promise;
+  body.id = max + 1;
+
+  // Update the article comment count
+  var promise = new Promise(async function(resolve, reject) {
+    var article =  await getArticle(body.article);
     article.commentsCount += 1;
 
-    return sqlDatabase("articles").where("id",article.id).update(article);
+    await sqlDatabase("articles").where("id",article.id).update(article).then(()=>{resolve();});
   });
 
   await promise;
 
+  // Updating comment count (if need)
   if(body.parent != -1){
-    promise =  new Promise(function(resolve, reject) {
-      var comment = getComment(body.parent);
+    promise = new Promise(async function(resolve, reject) {
+      var comment = await getComment(body.parent);
       comment.commentsCount += 1;
 
-      return sqlDatabase("comments").where("id",comment.id).update(comment);
+      await sqlDatabase("comments").where("id",comment.id).update(comment).then(()=>{resolve();});
     });
 
     await promise;
   }
 
+  // Pushing the comment in the db
   return sqlDatabase("comments").insert(body).then(result => {
-    result.user = getSimpleUser(result.user);
-    topItem.children = [];
-    topItem.userLike = false;
+    return sqlDatabase("comments").where("id",body.id).then(async function(array){
+      var data = array[0];
+      data.user = await getSimpleUser(data.user);
+      data.children = [];
+      data.userLike = false;
+      return data;
+    });
   });
 }

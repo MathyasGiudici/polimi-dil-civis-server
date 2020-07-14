@@ -17,7 +17,7 @@ exports.getArticles = function() {
       text: 'Articolo 1 testoooooo',
       topic: 'topic1',
       likesCount: 2,
-      commentsCount: 0,
+      commentsCount: 2,
       timestamp: '2020-06-25T09:00:00Z',
       statistics: 'noUrl',
       isHome: true,

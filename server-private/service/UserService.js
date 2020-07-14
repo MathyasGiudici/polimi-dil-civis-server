@@ -10,7 +10,7 @@ const fileupload = require('express-fileupload');
 var sqlDatabase;
 
 // Utils
-var {getUsers} = require("./utils/UserUtils");
+var {getUsers, parseUser} = require("./utils/UserUtils");
 
 exports.userInit = function(database) {
   sqlDatabase = database;
@@ -78,9 +78,8 @@ exports.userLogin = async function(body) {
       const correctPassword = await argon2.verify(user.password, body.password);
       // Correctness of the password
       if(correctPassword){
-        delete user.password;
         return {response: "Successful login",
-                user: user,
+                user: parseUser(user),
                 token: generateJWT(user)};
       }
       else
@@ -96,8 +95,7 @@ exports.userMe = function(email) {
   return sqlDatabase("users").where("email",email).select().then(
     data => {
       return data.map( e => {
-        delete e.password;
-        return e;
+        return parseUser(e);
       });
     }).then( data => {return data[0];});
 }
@@ -124,8 +122,7 @@ exports.userRegistration = async function(body) {
           return sqlDatabase("users").where("email",body.email).select().then(
             data => {
               return data.map( e => {
-                delete e.password;
-                return e;
+                return parseUser(e);
               });
             }).then( data => {return data[0];});
         });
@@ -203,8 +200,7 @@ exports.userUpdate = async function(body) {
          return sqlDatabase("users").where("email",body.email).select().then(
             data => {
               return data.map( e => {
-                 delete e.password;
-                 return e;
+                 return parseUser(e);
               });
             }).then( data => {return data[0];});
       });
@@ -216,8 +212,7 @@ exports.userUpdate = async function(body) {
            return sqlDatabase("users").where("email",body.email).select().then(
               data => {
                 return data.map( e => {
-                   delete e.password;
-                   return e;
+                   return parseUser(e);
                 });
               }).then( data => {return data[0];});
         });

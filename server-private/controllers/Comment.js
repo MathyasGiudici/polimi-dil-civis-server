@@ -52,7 +52,7 @@ module.exports.commentsGet = function commentsGet (req, res, next) {
   if((session) && session.name != 'TokenExpiredError')
     email = session.user.email;
 
-  var article = req.swagger.params['article'].value;
+  var article = parseInt(req.swagger.params['article'].value);
 
   Comment.commentsGet(article,email)
     .then(function (response) {
@@ -71,14 +71,13 @@ module.exports.commentsPost = function commentsPost (req, res, next) {
   if((!session) || session.name == 'TokenExpiredError')
     return utils.unauthorizeAction(res);
 
-  // Checking not fake modification
-  if(session.user.email != body.user.email)
-    return utils.unauthorizeAction(res);
-
-  var article = req.swagger.params['article'].value;
   var body = req.swagger.params['body'].value;
 
-  Comment.commentsPost(article,body)
+  // Checking not fake modification
+  if(session.user.email != body.user)
+    return utils.unauthorizeAction(res);
+
+  Comment.commentsPost(body)
     .then(function (response) {
       utils.writeJson(res, response);
     })

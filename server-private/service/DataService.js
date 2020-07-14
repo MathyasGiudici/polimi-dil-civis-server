@@ -14,7 +14,7 @@ var database;
 console.log(__dirname);
 
 const parametersDebug = {
-  debug: true,
+  debug: false,
   client: 'pg',
   version: '12.3',
   connection: {
