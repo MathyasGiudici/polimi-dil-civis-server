@@ -4,8 +4,7 @@
 const argon2 = require('argon2');
 const {generateJWT} = require('./AuthService');
 
-// Import of image uploader
-const fileupload = require('express-fileupload');
+const fs = require('fs');
 
 var sqlDatabase;
 
@@ -153,12 +152,12 @@ exports.userRegistration = async function(body) {
  * image File
  * no response value expected for this operation
  **/
-exports.userRegistrationPicture = async function(email,image,req) {
+exports.userRegistrationPicture = async function(email,image) {
   // Checking if the user is in the database
-  var promise = new Promise(function(resolve, reject){
-    return sqlDatabase("users").where("email",email).select().then(
+  var promise = new Promise(async function(resolve, reject){
+    await sqlDatabase("users").where("email",email).select().then(
       data => {
-        if(data.length > 0)
+        if(data.length != 0)
           resolve(true);
         else
           resolve(false);
@@ -171,18 +170,25 @@ exports.userRegistrationPicture = async function(email,image,req) {
     return { response: 'error' };
 
   var name = email.trim().replace('.','').replace('@','');
-  const file = req.files.image;
-  const path = __dirname + '/server-public/users-pic/' + name;
 
+  // Recomputing the path
+  var dirArray = __dirname.split('/');
+  var path = '';
+  for(let i=0; i < (dirArray.length - 2); i++)
+    path = path + dirArray[i] + '/';
 
-  file.mv(path, (error) => {
-    if (error) {j
-      console.error(error);
+  path = path + 'server-public/users-pic/' + name + '.' +
+    image.originalname.split('.')[image.originalname.split('.').length - 1];
+
+  let result = await fs.writeFile(path, image.buffer,function(err){
+    if (err)
       return { response: 'error' };
-    }
-
-    return { response: 'OK' };
   });
+
+  if(result != null)
+    return result;
+  else
+    return { response: 'OK' };
 }
 
 

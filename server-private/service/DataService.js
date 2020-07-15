@@ -10,9 +10,6 @@ var {userInit} = require("./UserService");
 // Creating the db
 var database;
 
-// // DEBUG: check the variable
-console.log(__dirname);
-
 const parametersDebug = {
   debug: false,
   client: 'pg',

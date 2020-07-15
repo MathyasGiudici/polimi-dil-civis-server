@@ -1,18 +1,11 @@
-import string 
-import csv
 import os
+import csv
+import string
 import re
-import pandas as pd
-import nltk
-from nltk.corpus import stopwords
-import shutil
-import hunspell
-from pattern.it import suggest
-from tempfile import NamedTemporaryFile
 import json
 
 cwd = os.getcwd()
-tweetsFile = "/DIL/DIL-New2.csv" #cambiare il path
+tweetsFile = "/datasets/DIL-New2.csv"
 path = cwd + tweetsFile
 List = []
 with open(path, 'r') as csvfile:
@@ -29,12 +22,12 @@ with open(path, 'r') as csvfile:
         date[10] = 'T'
         date = "".join(date)
         date = date + 'Z'
-        
+
         topic = 'topic'
         isHome = False
         regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-        url = re.findall(regex,text)    
-        #dictionary object 
+        url = re.findall(regex,text)[0]
+        #dictionary object
         myobject = {
           "id": count,
           "title": text.split('\n')[0] ,
@@ -50,9 +43,9 @@ with open(path, 'r') as csvfile:
         }
 
         count+=1
-        List.append(json.dumps(myobject))
+        List.append(myobject)
     #create json file
-    with open('output.json', 'w') as jsnfile:
+    with open('datasets/output.json', 'w') as jsnfile:
         obj = {
             "array": List,
         }

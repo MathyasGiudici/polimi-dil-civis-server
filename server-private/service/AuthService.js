@@ -16,10 +16,13 @@ exports.generateJWT = function(user){
 // Function to get the token from the header
 const getTokenFromHeader = (req) => {
   if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-    return req.headers.authorization.split(' ')[1];
+    if(req.headers.authorization.split(' ')[1] == null)
+      return jwt.sign({data: 'TokenExpiredError'}, signature);
+    else
+      return req.headers.authorization.split(' ')[1];
   }
   else{
-    return jwt.sign({data: 'TokenExpiredError'}, signature)
+    return jwt.sign({data: 'TokenExpiredError'}, signature);
   }
 }
 
