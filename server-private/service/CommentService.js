@@ -192,20 +192,21 @@ exports.commentsGet = function(article,email) {
     }
 
     for(let i=0; i < top.length; i++){
-      var topItem = top[i];
+      let topItem = top[i];
       topItem.user = user[usersId.indexOf(topItem.user)];
       topItem.children = [];
       topItem.userLike = await getUserLike(topItem.id,email);
 
       for(let j=0; j < bottom.length; j++){
-        var bottomItem = bottom[j];
-        bottomItem.user = user[usersId.indexOf(bottomItem.user)];
-        bottomItem.userLike = await getUserLike(bottomItem.id,email);
-
-        if(bottomItem.parent == topItem.id)
+        let bottomItem = bottom[j];
+        if(bottomItem.parent == topItem.id){
+          bottomItem.user = user[usersId.indexOf(bottomItem.user)];
+          bottomItem.userLike = await getUserLike(bottomItem.id,email);
           topItem.children.push(bottomItem);
+        }
       }
     }
+
     return top;
   });
 }
