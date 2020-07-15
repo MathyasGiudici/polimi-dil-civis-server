@@ -665,6 +665,9 @@ definitions:
       timestamp:
         type: "string"
         format: "date-time"
+    required:
+      - email
+      - code
     example:
       code: 0.80082819046101150206595775671303272247314453125
       email: "email"
@@ -698,7 +701,7 @@ definitions:
         - "female"
         - "male"
       birthday:
-        type: "integer"
+        type: "string"
         format: "date"
       country:
         type: "string"
@@ -706,7 +709,6 @@ definitions:
         type: "string"
       profilePic:
         type: "string"
-        format: "url"
       level:
         type: "integer"
         minimum: 1

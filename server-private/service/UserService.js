@@ -73,7 +73,7 @@ exports.userLogin = async function(body) {
       var user = data[0];
 
       if(!user.verify)
-        return {response: "You must verify your phone"};
+        return {response: "You must verify your phone number"};
       // Checking the password
       const correctPassword = await argon2.verify(user.password, body.password);
       // Correctness of the password
@@ -109,33 +109,34 @@ exports.userMe = function(email) {
 exports.userRegistration = async function(body) {
   return sqlDatabase("users").where("email",body.email).select().then(async function(data) {
     // Checking if the user exists
-    if(data.length != 0)
-      return {response: "You are already register"};
+    if(data.length != 0){
+      if(!data[0].verify)
+        return {response: "You are already register, but your phone number is not verified"};
+      else
+        return {response: "You are already register"};
+    }
 
     const passwordHashed = await argon2.hash(body.password);
     body.password = passwordHashed;
     body.verify = false;
 
-    var userPromise = new Promise(function(resolve, reject) {
-      return sqlDatabase("users").insert(body).then(
-        data => {
-          return sqlDatabase("users").where("email",body.email).select().then(
-            data => {
-              return data.map( e => {
-                return parseUser(e);
-              });
-            }).then( data => {return data[0];});
+    var userPromise = new Promise(async function(resolve, reject) {
+      await sqlDatabase("users").insert(body).then(async function(data){
+        await sqlDatabase("users").where("email",body.email).select().then(async function(data){
+          var user = data[0];
+          resolve(parseUser(user));
         });
+      });
     });
 
-    var smsPromise = new Promise(function(resolve, reject) {
-      var code = ("0000" + (Math.floor(Math.random() * 1000))).slice(-4);
+    var smsPromise = new Promise(async function(resolve, reject) {
+      var code = ("0000" + (Math.floor(Math.random() * 100000))).slice(-6);
       var date = new Date();
-      return sqlDatabase("users").insert({
+      await sqlDatabase("sms").insert({
         email: body.email,
         code: code,
         timestamp: date.toISOString()
-      });
+      }).then(()=>{resolve();});
     });
 
     await smsPromise;
@@ -206,7 +207,7 @@ exports.userUpdate = async function(body) {
       });
   } else {
     return sqlDatabase("users").where("email",body.email).select().then( myUser => {
-      body.password = myUser[0].password;
+        body.password = myUser[0].password;
       return sqlDatabase("users").where("email",body.email).update(body).then(
          data => {
            return sqlDatabase("users").where("email",body.email).select().then(

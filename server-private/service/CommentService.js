@@ -192,16 +192,13 @@ exports.commentsGet = function(article,email) {
     }
 
     for(let i=0; i < top.length; i++){
-      console.log("here");
       var topItem = top[i];
       topItem.user = user[usersId.indexOf(topItem.user)];
       topItem.children = [];
       topItem.userLike = await getUserLike(topItem.id,email);
 
-      console.log(bottom);
       for(let j=0; j < bottom.length; j++){
         var bottomItem = bottom[j];
-        console.log(bottomItem);
         bottomItem.user = user[usersId.indexOf(bottomItem.user)];
         bottomItem.userLike = await getUserLike(bottomItem.id,email);
 
@@ -209,9 +206,6 @@ exports.commentsGet = function(article,email) {
           topItem.children.push(bottomItem);
       }
     }
-
-    console.log(top);
-
     return top;
   });
 }

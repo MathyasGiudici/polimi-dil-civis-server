@@ -42,16 +42,16 @@ exports.getSms = function() {
  * returns User
  **/
 exports.smsVerification = async function(body) {
-  var promise = new Promise(function(resolve, reject) {
-    return sqlDatabase("sms").where("email",body.email).select().then( data => {
+  var promise = new Promise(async function(resolve, reject) {
+    await sqlDatabase("sms").where("email",body.email).select().then( data => {
       if(data.length > 0){
           if(body.code == data[0].code)
             resolve(true);
           else
-            response(false);
+            resolve(false);
       }
       else {
-        response(false);
+        resolve(false);
       }
     });
   });
