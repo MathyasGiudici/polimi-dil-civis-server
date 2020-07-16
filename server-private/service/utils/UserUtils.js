@@ -6,6 +6,7 @@ exports.parseUser = function(user) {
   delete user.verify;
   delete user.password;
   user.birthday = user.birthday.toISOString().split('T')[0];
+  user.profilePic = {uri: user.profilePic};
   return user;
 }
 

@@ -67,7 +67,7 @@ const getSimpleUser = async function (email) {
         simple.name = data[0].name;
         simple.surname = data[0].surname;
         simple.level = data[0].level;
-        simple.profilePic = data[0].profilePic;
+        simple.profilePic = {uri: data[0].profilePic};
         resolve(simple);
       });
   });
