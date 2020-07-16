@@ -106,6 +106,19 @@ const getComment = async function (id) {
   });
 }
 
+const getChildren = async function(parent,email) {
+  return new Promise(async function(resolve, reject) {
+    await sqlDatabase("comments").where("parent",parent).select().then(async function(result){
+      for(let i=0; i < result.length; i++){
+        result[i].user = await getSimpleUser(result[i].user);
+        result[i].userLike = await getUserLike(result[i].id,email);
+        result[i].children = [];
+      }
+      resolve(result);
+    });
+  });
+}
+
 /**
  *
  * id BigDecimal
@@ -117,7 +130,10 @@ exports.commentLikePost = async function(id,email) {
 
   if(alreadyLiked){
     comment.user = await getSimpleUser(comment.user)
-    comment.children = [];
+    if(comment.parent != -1)
+      comment.children = [];
+    else
+      comment.children = await getChildren(comment.id,email);
     comment.userLike = true;
     return comment;
   }
@@ -128,7 +144,10 @@ exports.commentLikePost = async function(id,email) {
   await sqlDatabase("commentLikes").insert({comment:comment.id,user:email});
 
   comment.user = await getSimpleUser(comment.user)
-  comment.children = [];
+  if(comment.parent != -1)
+    comment.children = [];
+  else
+    comment.children = await getChildren(comment.id,email);
   comment.userLike = true;
 
   return comment;
@@ -146,7 +165,10 @@ exports.commentLikeRemove = async function(id,email) {
 
   if(!alreadyLiked){
     comment.user = await getSimpleUser(comment.user)
-    comment.children = [];
+    if(comment.parent != -1)
+      comment.children = [];
+    else
+      comment.children = await getChildren(comment.id,email);
     comment.userLike = false;
     return comment;
   }
@@ -157,7 +179,10 @@ exports.commentLikeRemove = async function(id,email) {
   await sqlDatabase("commentLikes").where("user",email).where("comment",id).del();
 
   comment.user = await getSimpleUser(comment.user)
-  comment.children = [];
+  if(comment.parent != -1)
+    comment.children = [];
+  else
+    comment.children = await getChildren(comment.id,email);
   comment.userLike = false;
 
   return comment;
