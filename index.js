@@ -15,6 +15,10 @@ var serveStatic = require('serve-static');
 // Importing initialization of the database
 var {databaseInit} = require("./server-private/service/DataService");
 
+// response utils
+var utils = require('./server-private/utils/writer.js');
+const {decodeJWT} = require('./server-private/service/AuthService');
+
 // swaggerRouter configuration
 var options = {
   swaggerUi: path.join(__dirname, '/swagger.json'),
@@ -41,9 +45,20 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   // Serve the Swagger documents and Swagger UI
   app.use(middleware.swaggerUi());
 
+  app.use(function(req, res, next) {
+    if (req.url.split('/')[1] === 'statistics'){
+      //Extract session
+      var session = decodeJWT(req);
+      console.log(session);
+      // Checking if it is the correct one
+      if((!session) || session.name == 'TokenExpiredError' || !session.user.premium)
+        return utils.unauthorizeAction(res);
+    }
+    next();
+  });
+
   // Serve-Static folder
   app.use(serveStatic(__dirname + "/server-public"));
-
   // Database initialization
   databaseInit();
 
