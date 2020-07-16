@@ -6,7 +6,8 @@ exports.parseUser = function(user) {
   delete user.verify;
   delete user.password;
   user.birthday = user.birthday.toISOString().split('T')[0];
-  user.profilePic = {uri: user.profilePic};
+  if(user.profilePic != "")
+    user.profilePic = JSON.parse(user.profilePic);
   return user;
 }
 
@@ -23,7 +24,7 @@ exports.getUsers = async function() {
       birthday : "1973-01-01",
       country: "italy",
       phone: "3335879651",
-      profilePic: "https://polimi-dil-civis.herokuapp.com/users-pic/cesare.png",
+      profilePic: '{"uri":"https://polimi-dil-civis.herokuapp.com/users-pic/cesare.png"}',
       level: 3,
       premium: true
     },
@@ -37,7 +38,7 @@ exports.getUsers = async function() {
       birthday : "1996-05-02",
       country: "italy",
       phone: "3235771631",
-      profilePic: "https://polimi-dil-civis.herokuapp.com/users-pic/laura.png",
+      profilePic: '{"uri":"https://polimi-dil-civis.herokuapp.com/users-pic/laura.png"}',
       level: 1,
       premium: false
     }

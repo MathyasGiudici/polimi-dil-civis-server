@@ -157,19 +157,20 @@ exports.userRegistrationPicture = async function(email,image) {
   var promise = new Promise(async function(resolve, reject){
     await sqlDatabase("users").where("email",email).select().then(
       data => {
-        if(data.length != 0)
-          resolve(true);
+        if(data.length > 0)
+          resolve(data[0]);
         else
-          resolve(false);
+          resolve(null);
       });
   });
 
-  var registered = await promise;
+  var user = await promise;
 
-  if(!registered)
+  if(user == null)
     return { response: 'error' };
 
   var name = email.trim().replace('.','').replace('@','');
+  name = name + '.' + image.originalname.split('.')[image.originalname.split('.').length - 1];
 
   // Recomputing the path
   var dirArray = __dirname.split('/');
@@ -177,18 +178,24 @@ exports.userRegistrationPicture = async function(email,image) {
   for(let i=0; i < (dirArray.length - 2); i++)
     path = path + dirArray[i] + '/';
 
-  path = path + 'server-public/users-pic/' + name + '.' +
-    image.originalname.split('.')[image.originalname.split('.').length - 1];
+  path = path + 'server-public/users-pic/' + name;
 
   let result = await fs.writeFile(path, image.buffer,function(err){
     if (err)
       return { response: 'error' };
   });
 
-  if(result != null)
+  if(result != null){
     return result;
-  else
+  }
+  else{
+    var pictureUrl = '{"uri":"https://polimi-dil-civis.herokuapp.com/users-pic/' +
+    name + '"}'
+    user.profilePic = pictureUrl;
+    await sqlDatabase("users").where("email",user.email).update(user);
     return { response: 'OK' };
+  }
+
 }
 
 

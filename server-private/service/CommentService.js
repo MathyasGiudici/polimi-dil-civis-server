@@ -4,6 +4,7 @@ var sqlDatabase;
 
 // Utils
 var {getComments, getLikes} = require("./utils/CommentUtils");
+var {parseUser} = require("./utils/UserUtils");
 
 exports.commentInit = function(database) {
   commentTable(database);
@@ -62,12 +63,14 @@ const getSimpleUser = async function (email) {
   return new Promise(async function(resolve, reject) {
     sqlDatabase("users").where("email",email).select().then(
       data => {
+        var user = data[0];
+        user = parseUser(user);
         var simple = {};
-        simple.email = data[0].email;
-        simple.name = data[0].name;
-        simple.surname = data[0].surname;
-        simple.level = data[0].level;
-        simple.profilePic = {uri: data[0].profilePic};
+        simple.email = user.email;
+        simple.name = user.name;
+        simple.surname = user.surname;
+        simple.level = user.level;
+        simple.profilePic = user.profilePic;
         resolve(simple);
       });
   });
