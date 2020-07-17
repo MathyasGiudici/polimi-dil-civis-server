@@ -9,72 +9,52 @@ exports.parseArticle = function (article) {
   delete article.isHome;
 }
 
+var fs = require('fs');
+
+
 exports.getArticles = function() {
-  return [
-    {
-      id: 0,
-      title: 'Articolo 1',
-      text: 'Articolo 1 testoooooo',
-      topic: 'topic1',
-      likesCount: 2,
-      commentsCount: 2,
-      timestamp: '2020-06-25T09:00:00Z',
-      statistics: 'test.png',
-      isHome: true,
-      sourceName: 'source 1',
-      sourceUrl: 'source1url',
-    },
-    {
-      id: 1,
-      title: 'Articolo 2',
-      text: 'Articolo 2 testoooooo',
-      topic: 'topic1',
-      likesCount: 0,
-      commentsCount: 0,
-      timestamp: '2020-06-25T09:00:00Z',
-      statistics: '',
-      isHome: false,
-      sourceName: 'source 2',
-      sourceUrl: 'source2url',
-    },
-    {
-      id: 2,
-      title: 'Articolo 3',
-      text: 'Articolo 3 testoooooo',
-      topic: 'topic2',
-      likesCount: 0,
-      commentsCount: 0,
-      timestamp: '2020-06-25T09:00:00Z',
-      statistics: 'test.png',
-      isHome: true,
-      sourceName: 'source 3',
-      sourceUrl: 'source3url',
-    }
-  ];
+  var file = fs.readFileSync('./server-private/service/utils/articles.json');
+  var fileJSON = JSON.parse(file);
+  return fileJSON.array;
 }
 
 exports.getRecommendations = function() {
   return [
     {
       article: 0,
-      user : "cesare@email.it",
+      user : "cesare@email.it"
     },
     {
       article: 1,
-      user : "laura@email.it",
+      user : "cesare@email.it"
+    },
+    {
+      article: 2,
+      user : "cesare@email.it"
+    },
+    {
+      article: 3,
+      user : "cesare@email.it"
+    },
+    {
+      article: 10,
+      user : "laura@email.it"
+    },
+    {
+      article: 11,
+      user : "laura@email.it"
+    },
+    {
+      article: 12,
+      user : "laura@email.it"
+    },
+    {
+      article: 13,
+      user : "laura@email.it"
     }
   ];
 }
 
 exports.getLikes = function() {
-  return [
-    {
-      article: 0,
-      user : "cesare@email.it",
-    },
-    {
-      article: 0,
-      user : "laura@email.it",
-    }
-  ];
+  return [];
 }
